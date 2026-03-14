@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rankio — 실시간 창업 트렌드 랭킹</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ==================== NAV ==================== -->
+<nav id="nav">
+  <div class="nav-logo" onclick="showPage('home')">
+    Rank<span>io</span>
+  </div>
+  <div class="nav-links">
+    <div class="nav-link" onclick="showPage('home')">홈</div>
+    <div class="nav-link" onclick="showPage('rankings')">실시간 랭킹</div>
+    <div class="nav-link" onclick="showPage('brands')">브랜드</div>
+    <div class="nav-link" onclick="showPage('industry')">업종</div>
+    <div class="nav-link" onclick="showPage('themes')">테마</div>
+    <div class="nav-link" onclick="showPage('listings')">신규 매물</div>
+    <div class="nav-link" onclick="showPage('market')">상권분석</div>
+    <div class="nav-link" onclick="showPage('partners')">협력사</div>
+  </div>
+  <div class="nav-right">
+    <div class="btn btn-ghost" onclick="showPage('mypage')">마이페이지</div>
+    <div class="btn btn-outline" onclick="showPage('admin')">관리자</div>
+    <div class="btn btn-primary">시작하기</div>
+  </div>
+</nav>
+
+<div id="app">
+
+  <!-- ==================== HOME ==================== -->
+  <div class="page active" id="page-home">
+
+    <!-- 히어로 + 실시간 랭킹 탭 -->
+    <div style="background:var(--surface);border-bottom:1px solid var(--border);padding:32px 0 0;">
+      <div class="container">
+        <div class="flex-between" style="align-items:flex-end;margin-bottom:20px;">
+          <div>
+            <div class="live-badge mb8">
+              <div class="live-dot"></div>
+              LIVE — 방금 업데이트
+            </div>
+            <h1 style="font-size:32px;font-weight:800;letter-spacing:-0.8px;line-height:1.2;">
+              지금 뜨는 창업 트렌드<br>실시간으로 확인하세요
+            </h1>
+            <p style="font-size:14px;color:var(--text-secondary);margin-top:10px;">
+              검색량 · SNS · 뉴스 · 커뮤니티 데이터 기반으로 산정되는 실시간 랭킹
+            </p>
+          </div>
+          <div style="text-align:right;">
+            <div class="text-sm text-muted">마지막 업데이트</div>
+            <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;margin-top:2px;">2025.01.15 14:32</div>
+          </div>
+        </div>
+
+        <!-- [1] 실시간 순위 탭 차트 -->
+        <div class="rank-tab-wrapper">
+          <div class="rank-tab-header">
+            <div class="tabs" id="home-rank-tabs">
+              <button class="tab-btn active" onclick="switchHomeTab(this,'realtime_brand')">실시간 인기 브랜드</button>
+              <button class="tab-btn" onclick="switchHomeTab(this,'rising_brand')">급상승 브랜드</button>
+              <button class="tab-btn" onclick="switchHomeTab(this,'popular_category')">인기 업종</button>
+              <button class="tab-btn" onclick="switchHomeTab(this,'popular_region')">인기 창업 지역</button>
+              <button class="tab-btn" onclick="switchHomeTab(this,'new_interest')">신규 관심도</button>
+            </div>
+          </div>
+          <div id="home-rank-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- [2] 업종별 카테고리 + 테마 추천 -->
+    <div style="padding:40px 0 0;">
+      <div class="container">
+        <div class="flex-between mb16">
+          <div class="section-header" style="margin-bottom:0;">
+            <div class="section-title">업종별 탐색</div>
+            <div class="section-sub">카테고리를 선택해 브랜드를 찾아보세요</div>
+          </div>
+          <button class="more-btn" onclick="showPage('industry')">전체 보기 →</button>
+        </div>
+        <div id="cat-grid" style="display:grid;grid-template-columns:repeat(9,1fr);gap:10px;"></div>
+
+        <!-- 테마 추천 -->
+        <div class="mt32">
+          <div class="flex-between mb16">
+            <div>
+              <div class="section-title">테마별 추천 브랜드</div>
+              <div class="section-sub mt4">트렌드와 목적에 맞는 창업 브랜드를 찾아보세요</div>
+            </div>
+            <button class="more-btn" onclick="showPage('themes')">전체 테마 →</button>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;" id="theme-pills"></div>
+          <div class="grid-4" id="theme-brand-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- [3] 급상승 브랜드 이미지 섹션 -->
+    <div style="padding:40px 0 0;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-top:40px;">
+      <div class="container">
+        <div class="flex-between mb24">
+          <div>
+            <div class="flex-center gap8 mb4">
+              <div class="live-dot"></div>
+              <span style="font-size:11px;font-weight:700;color:var(--up);letter-spacing:0.06em;">급상승 중</span>
+            </div>
+            <div class="section-title">지금 뜨는 브랜드</div>
+          </div>
+          <button class="more-btn" onclick="showPage('rankings')">전체 랭킹 →</button>
+        </div>
+        <div class="grid-3" id="rising-brands-grid"></div>
+      </div>
+    </div>
+
+    <!-- [4] 신규 등록 매물 -->
+    <div style="padding:40px 0 0;">
+      <div class="container">
+        <div class="flex-between mb24">
+          <div>
+            <div class="section-title">신규 등록 가게 / 매물</div>
+            <div class="section-sub mt4">최근 등록된 양도양수·점포 매물을 확인하세요</div>
+          </div>
+          <button class="more-btn" onclick="showPage('listings')">전체 보기 →</button>
+        </div>
+        <div class="grid-3" id="home-listings"></div>
+      </div>
+    </div>
+
+    <!-- [5] 출석 체크 배너 -->
+    <div style="padding:40px 0 0;">
+      <div class="container">
+        <div class="attendance-banner">
+          <div>
+            <h3>🎯 오늘 출석 체크 하셨나요?</h3>
+            <p>매일 출석하면 포인트가 쌓여요. 누적 7일 출석 시 추가 보너스!</p>
+            <div class="day-dots">
+              <div class="day-dot done">월</div>
+              <div class="day-dot done">화</div>
+              <div class="day-dot done">수</div>
+              <div class="day-dot today">목</div>
+              <div class="day-dot">금</div>
+              <div class="day-dot">토</div>
+              <div class="day-dot">일</div>
+            </div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:36px;font-weight:900;color:#fff;font-family:'Space Mono',monospace;">+30</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:16px;">오늘의 포인트</div>
+            <button class="btn" style="background:var(--brand);color:#fff;padding:10px 28px;font-size:14px;" onclick="showPage('mypage')">출석 체크하기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- [6] 추천 협력사 -->
+    <div style="padding:40px 0 0;">
+      <div class="container">
+        <div class="flex-between mb24">
+          <div>
+            <div class="section-title">추천 협력사</div>
+            <div class="section-sub mt4">창업 준비에 필요한 신뢰할 수 있는 파트너</div>
+          </div>
+          <button class="more-btn" onclick="showPage('partners')">전체 보기 →</button>
+        </div>
+        <div class="grid-3" id="home-partners"></div>
+      </div>
+    </div>
+
+    <div id="footer-placeholder-home"></div>
+  </div><!-- /page-home -->
+
+
+  <!-- ==================== RANKINGS ==================== -->
+  <div class="page" id="page-rankings">
+    <div class="container" style="padding-top:32px;">
+      <div class="page-header">
+        <div class="flex-between">
+          <div>
+            <div class="live-badge mb8"><div class="live-dot"></div>LIVE 랭킹</div>
+            <div class="page-title">실시간 창업 트렌드 랭킹</div>
+            <div class="page-sub mt4">검색량 · SNS · 뉴스 · 커뮤니티 데이터 종합 분석</div>
+          </div>
+          <div class="flex-center gap12">
+            <select class="filter-select"><option>실시간</option><option>일간</option><option>주간</option><option>월간</option></select>
+            <div style="font-size:12px;color:var(--text-muted);">최근 수집: <span style="font-family:'Space Mono',monospace;font-weight:700;">14:32</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="tabs mb24" id="rank-page-tabs">
+        <button class="tab-btn active" onclick="switchRankTab(this,'realtime_brand')">인기 브랜드</button>
+        <button class="tab-btn" onclick="switchRankTab(this,'rising_brand')">급상승 브랜드</button>
+        <button class="tab-btn" onclick="switchRankTab(this,'popular_category')">인기 업종</button>
+        <button class="tab-btn" onclick="switchRankTab(this,'popular_region')">인기 지역</button>
+        <button class="tab-btn" onclick="switchRankTab(this,'new_interest')">신규 관심도</button>
+      </div>
+      <div class="grid-2" style="gap:24px;align-items:start;">
+        <div class="card" id="rank-page-list"></div>
+        <div>
+          <div class="card" style="padding:20px;">
+            <div class="section-title mb16">랭킹 변화 추이</div>
+            <div id="rank-change-chart"></div>
+            <div class="separator"></div>
+            <div style="font-size:15px;font-weight:700;margin-bottom:12px;">데이터 수집 현황</div>
+            <div id="data-source-info"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="footer-rankings"></div>
+  </div><!-- /page-rankings -->
+
+
+  <!-- ==================== BRANDS LIST ==================== -->
+  <div class="page" id="page-brands">
+    <div class="container" style="padding-top:32px;">
+      <div class="page-header">
+        <div class="page-title">브랜드 탐색</div>
+        <div class="page-sub">국내 주요 창업 브랜드를 탐색하고 비교해보세요</div>
+      </div>
+      <div class="filter-bar">
+        <div class="search-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="브랜드 검색...">
+        </div>
+        <select class="filter-select" id="brand-cat-filter"><option value="">전체 업종</option></select>
+        <select class="filter-select"><option>랭킹순</option><option>창업비 낮은순</option><option>매장수순</option><option>최신순</option></select>
+      </div>
+      <div class="grid-4" id="brands-grid" style="margin-bottom:40px;"></div>
+    </div>
+    <div id="footer-brands"></div>
+  </div><!-- /page-brands -->
+
+
+  <!-- ==================== BRAND DETAIL ==================== -->
+  <div class="page" id="page-brand-detail">
+    <div class="brand-hero">
+      <div class="brand-hero-inner" id="brand-detail-hero"></div>
+    </div>
+    <div class="container" style="padding-top:32px;">
+      <div class="grid-2" style="gap:24px;align-items:start;">
+        <div>
+          <div class="card" style="padding:24px;margin-bottom:20px;" id="brand-detail-info"></div>
+          <div class="card" style="padding:24px;" id="brand-detail-about"></div>
+        </div>
+        <div>
+          <div class="card" style="padding:24px;margin-bottom:20px;" id="brand-detail-rank-history"></div>
+          <div class="card" style="padding:24px;" id="brand-detail-themes"></div>
+        </div>
+      </div>
+    </div>
+    <div id="footer-brand-detail"></div>
+  </div><!-- /page-brand-detail -->
+
+
+  <!-- ==================== INDUSTRY ==================== -->
+  <div class="page" id="page-industry">
+    <div class="container" style="padding-top:32px;">
+      <div class="page-header">
+        <div class="page-title">업종 탐색</div>
+        <div class="page-sub">관심 업종을 선택해 인기 브랜드를 확인하세요</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;" id="industry-cat-chips"></div>
+      <div class="grid-2" style="gap:24px;" id="industry-content"></div>
+    </div>
+    <div id="footer-industry"></div>
+  </div><!-- /page-industry -->
+
+
+  <!-- ==================== THEMES ==================== -->
+  <div class="page" id="page-themes">
+    <div class="container" style="padding-top:32px;">
+      <div class="page-header">
+        <div class="page-title">테마별 브랜드</div>
+        <div class="page-sub">목적과 트렌드에 맞는 창업 브랜드를 찾아보세요</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;" id="all-theme-pills"></div>
+      <div class="grid-4" id="themes-brands-grid"></div>
+    </div>
+    <div id="footer-themes"></div>
+  </div><!-- /page-themes -->
+
+
+  <!-- ==================== LISTINGS ==================== -->
+  <div class="page" id="page-listings">
+    <div class="container" style="padding-top:32px;">
+      <div class="page-header">
+        <div class="page-title">신규 등록 가게 / 매물</div>
+        <div class="page-sub">양도양수, 점포 매물을 지역·업종·투자금으로 필터링하세요</div>
+      </div>
+      <div class="filter-bar">
+        <div class="search-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="지역, 브랜드, 업종...">
+        </div>
+        <select class="filter-select"><option>전체 지역</option><option>서울</option><option>경기</option><option>부산</option><option>대구</option><option>인천</option></select>
+        <select class="filter-select"><option>전체 업종</option><option>카페</option><option>치킨</option><option>한식</option><option>디저트</option></select>
+        <select class="filter-select"><option>전체 투자금</option><option>~3천만원</option><option>~5천만원</option><option>~1억</option><option>1억 이상</option></select>
+        <select class="filter-select"><option>최신순</option><option>투자금 낮은순</option></select>
+      </div>
+      <div class="grid-3" id="listings-grid" style="margin-bottom:40px;"></div>
+    </div>
+    <div id="footer-listings"></div>
+  </div><!-- /page-listings -->
+
+
+  <!-- ==================== MARKET ==================== -->
+  <div class="page" id="page-market">
+    <div style="padding:32px 0 0;">
+      <div class="container">
+        <div class="page-header">
+          <div class="page-title">상권 분석</div>
+          <div class="page-sub">지역을 선택해 인기 업종과 창업 트렌드를 확인하세요</div>
+        </div>
+      </div>
+      <div class="container-lg">
+        <div style="display:flex;gap:24px;align-items:start;">
+          <!-- 지역 선택 -->
+          <div style="width:200px;flex-shrink:0;">
+            <div class="card" style="padding:16px;">
+              <div style="font-size:13px;font-weight:700;margin-bottom:12px;">지역 선택</div>
+              <div id="region-list" style="display:flex;flex-direction:column;gap:2px;"></div>
+            </div>
+          </div>
+          <!-- 지도 목업 -->
+          <div style="flex:1;">
+            <div class="map-mock">
+              <div class="map-overlay"></div>
+              <div class="map-label">🗺️ 지역별 상권 지도</div>
+            </div>
+          </div>
+          <!-- 지역 데이터 패널 -->
+          <div style="width:260px;flex-shrink:0;" id="region-data-panel"></div>
+        </div>
+      </div>
+      <div class="container" style="padding-top:32px;" id="market-bottom"></div>
+    </div>
+    <div id="footer-market"></div>
+  </div><!-- /page-market -->
+
+
+  <!-- ==================== PARTNERS ==================== -->
+  <div class="page" id="page-partners">
+    <div class="container" style="padding-top:32px;">
+      <div class="page-header">
+        <div class="page-title">협력사 검색</div>
+        <div class="page-sub">창업 준비에 필요한 전문 파트너사를 찾아보세요</div>
+      </div>
+      <div class="filter-bar">
+        <div class="search-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="협력사명, 서비스...">
+        </div>
+        <select class="filter-select" id="partner-cat-filter"><option value="">전체 카테고리</option></select>
+        <select class="filter-select"><option>전체 지역</option><option>서울</option><option>전국</option></select>
+      </div>
+      <div class="grid-3" id="partners-grid" style="margin-bottom:40px;"></div>
+    </div>
+    <div id="footer-partners"></div>
+  </div><!-- /page-partners -->
+
+
+  <!-- ==================== MYPAGE ==================== -->
+  <div class="page" id="page-mypage">
+    <div class="container" style="padding-top:32px;">
+      <div class="page-header">
+        <div class="page-title">마이페이지</div>
+      </div>
+      <div class="grid-2" style="gap:24px;align-items:start;">
+        <div>
+          <!-- 프로필 -->
+          <div class="profile-header mb16">
+            <div class="avatar">😊</div>
+            <div>
+              <div style="font-size:18px;font-weight:800;">예비창업자123</div>
+              <div class="text-muted text-sm mt4">startup@example.com</div>
+              <div class="flex-center gap8 mt8">
+                <span class="badge">일반회원</span>
+                <span class="text-sm text-muted">가입일: 2024.08.01</span>
+              </div>
+            </div>
+          </div>
+          <!-- 포인트 요약 -->
+          <div class="point-bar mb16">
+            <div class="point-item card">
+              <div class="point-val" style="color:var(--brand);">2,430</div>
+              <div class="point-key">보유 포인트</div>
+            </div>
+            <div class="point-item card">
+              <div class="point-val">23</div>
+              <div class="point-key">누적 출석일</div>
+            </div>
+            <div class="point-item card">
+              <div class="point-val">5</div>
+              <div class="point-key">관심 브랜드</div>
+            </div>
+          </div>
+          <!-- 출석 현황 -->
+          <div class="card" style="padding:20px;margin-bottom:16px;">
+            <div style="font-size:15px;font-weight:700;margin-bottom:16px;">출석 현황</div>
+            <div class="day-dots" style="justify-content:space-between;">
+              <div class="day-dot done" style="border-color:var(--up);background:var(--up);">월</div>
+              <div class="day-dot done" style="border-color:var(--up);background:var(--up);">화</div>
+              <div class="day-dot done" style="border-color:var(--up);background:var(--up);">수</div>
+              <div class="day-dot today" style="border:2px solid var(--brand);color:var(--brand);">목</div>
+              <div class="day-dot">금</div>
+              <div class="day-dot">토</div>
+              <div class="day-dot">일</div>
+            </div>
+            <button class="btn btn-primary w100 mt12" style="padding:10px;">오늘 출석 체크 (+30P)</button>
+          </div>
+          <!-- 포인트 내역 -->
+          <div class="card" style="padding:20px;">
+            <div style="font-size:15px;font-weight:700;margin-bottom:16px;">포인트 적립 내역</div>
+            <div id="point-history"></div>
+          </div>
+        </div>
+        <div>
+          <!-- 관심 브랜드 -->
+          <div class="card" style="padding:20px;margin-bottom:16px;">
+            <div class="flex-between mb16">
+              <div style="font-size:15px;font-weight:700;">관심 브랜드</div>
+              <button class="more-btn" onclick="showPage('brands')">더보기 →</button>
+            </div>
+            <div id="saved-brands-list"></div>
+          </div>
+          <!-- 최근 본 항목 -->
+          <div class="card" style="padding:20px;">
+            <div style="font-size:15px;font-weight:700;margin-bottom:16px;">최근 본 항목</div>
+            <div id="recently-viewed-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="footer-mypage"></div>
+  </div><!-- /page-mypage -->
+
+
+  <!-- ==================== ADMIN ==================== -->
+  <div class="page" id="page-admin">
+    <div class="admin-layout">
+      <div class="admin-sidebar">
+        <div class="sidebar-section">대시보드</div>
+        <div class="sidebar-item active" onclick="switchAdmin(this,'admin-dashboard')">📊 대시보드</div>
+        <div class="sidebar-section">콘텐츠 관리</div>
+        <div class="sidebar-item" onclick="switchAdmin(this,'admin-brands')">🏪 브랜드 관리</div>
+        <div class="sidebar-item" onclick="switchAdmin(this,'admin-categories')">📂 카테고리 관리</div>
+        <div class="sidebar-item" onclick="switchAdmin(this,'admin-themes')">🏷️ 테마 관리</div>
+        <div class="sidebar-item" onclick="switchAdmin(this,'admin-listings')">🏠 매물 관리</div>
+        <div class="sidebar-item" onclick="switchAdmin(this,'admin-partners')">🤝 협력사 관리</div>
+        <div class="sidebar-section">운영</div>
+        <div class="sidebar-item" onclick="switchAdmin(this,'admin-charts')">📈 차트 탭 관리</div>
+        <div class="sidebar-item" onclick="switchAdmin(this,'admin-users')">👥 사용자 관리</div>
+        <div class="sidebar-item" onclick="switchAdmin(this,'admin-points')">💰 포인트 정책</div>
+        <div class="sidebar-item" onclick="switchAdmin(this,'admin-banners')">🖼️ 배너 관리</div>
+        <div class="sidebar-section">데이터</div>
+        <div class="sidebar-item" onclick="switchAdmin(this,'admin-ranking-logs')">⚡ 랭킹 수집 로그</div>
+        <div class="sidebar-item" onclick="switchAdmin(this,'admin-data-sources')">🔌 데이터 소스</div>
+      </div>
+      <div class="admin-main" id="admin-content"></div>
+    </div>
+  </div><!-- /page-admin -->
+
+</div><!-- #app -->
+
+
+<!-- ==================== FOOTER TEMPLATE ==================== -->
+<template id="footer-tpl">
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="logo">Rankio</div>
+          <p>실시간 창업 트렌드와 브랜드 순위를 보여주는<br>데이터 기반 창업 인사이트 플랫폼</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-col">
+            <h4>서비스</h4>
+            <a onclick="showPage('rankings')">실시간 랭킹</a>
+            <a onclick="showPage('brands')">브랜드 탐색</a>
+            <a onclick="showPage('listings')">신규 매물</a>
+            <a onclick="showPage('market')">상권분석</a>
+          </div>
+          <div class="footer-col">
+            <h4>정보</h4>
+            <a>서비스 소개</a>
+            <a>데이터 출처</a>
+            <a>이용약관</a>
+            <a>개인정보처리방침</a>
+          </div>
+          <div class="footer-col">
+            <h4>고객지원</h4>
+            <a>공지사항</a>
+            <a>자주 묻는 질문</a>
+            <a>문의하기</a>
+            <a>협력사 등록</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 Rankio. All rights reserved.</p>
+        <p style="font-family:'Space Mono',monospace;font-size:11px;">데이터 기반 창업 인사이트</p>
+      </div>
+    </div>
+  </footer>
+</template>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script src="data/mockData.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/router.js"></script>
+
+</body>
+</html>
